@@ -102,3 +102,17 @@ const TableWithCheckboxes: React.FC = () => {
 
 export default TableWithCheckboxes;
 const newList = data.map(item => ({ ...item, checked: false }));
+function handleOnClick(app: any) {
+  const dependents = app.dependendedupon;
+
+  const isAllSelected = dependents.every((item: string) => {
+    const dependentObject = Data.find(obj => obj.application === item);
+    return dependentObject?.checked === true;
+  });
+
+  if (!isAllSelected) {
+    window.alert('All dependent objects are not selected');
+  }
+
+  // Rest of your code...
+}
