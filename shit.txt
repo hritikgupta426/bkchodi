@@ -1,0 +1,103 @@
+import React, { useState, useEffect } from 'react';
+
+interface ListItem {
+  id: number;
+  application: string;
+  uatDetails: string;
+  uatVersion: string;
+  devVersion: string;
+  prodVersion: string;
+  devDetails: string;
+  dependencies: number[]; // Array of IDs of dependent items
+}
+
+const TableWithCheckboxes: React.FC = () => {
+  const [dataList, setDataList] = useState<ListItem[]>([]);
+
+  useEffect(() => {
+    // Simulating fetching JSON data from the server
+    fetch('/api/data') // Replace '/api/data' with your actual API endpoint
+      .then(response => response.json())
+      .then(jsonData => {
+        // Assuming the JSON data received is an array of ListItem objects
+        setDataList(jsonData);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
+  const handleCheckboxChange = (itemId: number) => {
+    const updatedList = dataList.map(item => {
+      if (item.id === itemId) {
+        return {
+          ...item,
+          isChecked: !item.isChecked,
+        };
+      }
+      return item;
+    });
+
+    setDataList(updatedList);
+  };
+
+  const renderCheckboxes = (item: ListItem) => {
+    if (item.dependencies && item.dependencies.length > 0) {
+      const dependentItems = dataList.filter(dependentItem =>
+        item.dependencies.includes(dependentItem.id)
+      );
+
+      return (
+        <div>
+          {dependentItems.map(dependentItem => (
+            <div key={dependentItem.id}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={dependentItem.isChecked}
+                  onChange={() => handleCheckboxChange(dependentItem.id)}
+                />
+                {dependentItem.application}
+              </label>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>Application</th>
+            <th>UAT Details</th>
+            <th>UAT Version</th>
+            <th>Dev Version</th>
+            <th>Prod Version</th>
+            <th>Dev Details</th>
+            <th>Dependencies</th>
+          </tr>
+        </thead>
+        <tbody>
+          {dataList.map(item => (
+            <tr key={item.id}>
+              <td>{item.application}</td>
+              <td>{item.uatDetails}</td>
+              <td>{item.uatVersion}</td>
+              <td>{item.devVersion}</td>
+              <td>{item.prodVersion}</td>
+              <td>{item.devDetails}</td>
+              <td>{renderCheckboxes(item)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default TableWithCheckboxes;
