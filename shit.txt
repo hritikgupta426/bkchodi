@@ -101,3 +101,4 @@ const TableWithCheckboxes: React.FC = () => {
 };
 
 export default TableWithCheckboxes;
+const newList = data.map(item => ({ ...item, checked: false }));
